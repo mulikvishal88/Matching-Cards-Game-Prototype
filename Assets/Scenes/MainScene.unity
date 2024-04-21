@@ -1785,6 +1785,7 @@ MonoBehaviour:
   - {fileID: -1153715540, guid: de147935b98026a43a0b3abb1ecf2547, type: 3}
   _matchesText: {fileID: 91560556}
   _turnsText: {fileID: 1536782536}
+  _gameProgressData: {fileID: 11400000, guid: f3a575761b182704aa5d50dcff675468, type: 2}
 --- !u!4 &1028088927
 Transform:
   m_ObjectHideFlags: 0

@@ -48,6 +48,10 @@ public class Cell : MonoBehaviour
     {
         _scratchButton.onClick.AddListener(OnCellClick);
         SetState();
+        _onCellStateChange += (state) =>
+        {
+            GameManager._instance._gameProgressData._spriteArrayIndexArray[Id].CellState = state;
+        };
     }
     void OnCellClick()
     {

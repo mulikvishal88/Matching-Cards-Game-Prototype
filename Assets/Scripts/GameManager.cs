@@ -14,6 +14,11 @@ public class GameManager : MonoBehaviour
         {
             _matchCount = value;
             _matchesText.text = _matchCount.ToString();
+            _gameProgressData.MatchCount = value;
+            if(value >= _maximumMatchCount)
+            {
+                _gameProgressData._hasSavedProgress = false;
+            }
         }
         get{ return _matchCount; }
     }
@@ -23,6 +28,7 @@ public class GameManager : MonoBehaviour
         {
             turnCount = value;
             _turnsText.text = turnCount.ToString();
+            _gameProgressData.TurnCount = value;
         }
         get { return turnCount; }
     }
@@ -40,16 +46,29 @@ public class GameManager : MonoBehaviour
     private Sprite[] _cellImageCollection;
     [SerializeField]
     private TMP_Text _matchesText, _turnsText;
+    [HideInInspector]
+    public GameProgressData _gameProgressData;
     private int _maximumMatchCount;
     private GameManager()
     {
         _instance = this;
     }
+    private void Awake()
+    {
+        _gameProgressData = GameProgressData.Load();
+    }
     private void Start()
     {
         _homeButton.onClick.AddListener(SetHomeView);
         _playButton.onClick.AddListener(OnPlay);
-        SetHomeView();
+        if (_gameProgressData == null || !_gameProgressData._hasSavedProgress)
+        {
+            _gameProgressData = new GameProgressData();
+            SetHomeView();
+            return;
+        }
+
+        LaunchSavedGame();
     }
     private void OnPlay()
     {
@@ -70,6 +89,18 @@ public class GameManager : MonoBehaviour
         ConstructGameGrid(rowCount, columnCount, spriteArrayIndexArray);
         _homeView.SetActive(false);
     }
+    private void LaunchSavedGame()
+    {
+        _gameView.SetActive(true);
+        var rowCount = _gameProgressData._rowCount;
+        var columnCount = _gameProgressData._columnCount;
+        _maximumMatchCount = (rowCount * columnCount) / 2;
+        var spriteArrayIndexArray = _gameProgressData._spriteArrayIndexArray;
+        ConstructGameGrid(rowCount, columnCount, spriteArrayIndexArray);
+        _homeView.SetActive(false);
+        MatchCount = _gameProgressData.MatchCount;
+        TurnCount = _gameProgressData.TurnCount;
+    }
     private void ConstructGameGrid(int rowCount, int columnCount, CellData[] spriteArrayIndexArray)
     {
         var cellCounter = 0;
@@ -89,10 +120,15 @@ public class GameManager : MonoBehaviour
                 cellCounter++;
             }
         }
+        _gameProgressData._rowCount = rowCount;
+        _gameProgressData._columnCount = columnCount;
+        _gameProgressData._spriteArrayIndexArray = spriteArrayIndexArray;
+        _gameProgressData._hasSavedProgress = true;
 
     }
     private void SetHomeView()
     {
+        _gameProgressData._hasSavedProgress = false;
         _homeView.SetActive(true);
         _gameView.SetActive(false);
     }
@@ -107,5 +143,9 @@ public class GameManager : MonoBehaviour
         {
             Destroy(_horizontalGroupContainerTransform.GetChild(i).gameObject);
         }
+    }
+    private void OnApplicationQuit()
+    {
+        _gameProgressData.Save();
     }
 }
