@@ -121,6 +121,7 @@ public class Cell : MonoBehaviour
         GameManager._instance.TurnCount++;
         previousCell.Wrap();
         currentCell.Wrap();
+        SoundManager._instance.PlayMissmatchAudio();
     }
     IEnumerator HideWithDelay(Cell previousCell, Cell currentCell, float secends)
     {
@@ -129,5 +130,6 @@ public class Cell : MonoBehaviour
         GameManager._instance.MatchCount++;
         previousCell.Hide();
         currentCell.Hide();
+        SoundManager._instance.PlayMatchAudio();
     }
 }
